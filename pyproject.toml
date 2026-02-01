@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "personal_budget"
+version = "0.1.0"
+description = "A personal budget tracking application"
+dependencies = [
+    "streamlit",
+    "click",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["personal_budget*"]
