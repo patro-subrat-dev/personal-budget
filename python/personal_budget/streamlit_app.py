@@ -16,11 +16,8 @@ st.markdown("A tiny Streamlit UI to add transactions and view lists/summaries.")
 if 'form_id' not in st.session_state:
     st.session_state.form_id = 0
 
-# --- UPDATE YOUR FORM SECTION ---
-# Create a unique key for the inputs based on form_id
 suffix = str(st.session_state.form_id)
 
-# Add transaction form
 with st.form("add_txn"):
     ttype = st.selectbox("Type", ["income", "expense"], key="type_" + suffix)
     amount = st.number_input("Amount", min_value=0.0, format="%.2f", key="amount_" + suffix)
@@ -35,7 +32,6 @@ with st.form("add_txn"):
         init_db(conn)
         add_transaction(conn, date.isoformat(), float(amount), category, desc, ttype)
         
-        # These must be inside the 'if submitted' block
         st.session_state.form_id += 1 
         st.success("Transaction added and form cleared!")
         st.rerun()
@@ -65,7 +61,6 @@ if st.button("Show summary"):
     st.metric("Expense", f"{s['expense']:.2f}")
     st.metric("Net", f"{s['net']:.2f}")
 
-    # Category breakdown
     cats = category_totals(conn, int(year), int(month))
     if cats["expense"]:
         st.subheader("Expense by category")
@@ -99,7 +94,6 @@ if uploaded:
         st.subheader("Import errors")
         st.table([{"line": e["line"], "error": e["error"], "row": e["row"]} for e in result["errors"]])
 
-# Export all transactions to CSV
 if st.button("Export transactions to CSV"):
     rows_all = get_all_transactions(conn)
     import pandas as pd
@@ -107,7 +101,6 @@ if st.button("Export transactions to CSV"):
     csv_bytes = df.to_csv(index=False).encode("utf-8")
     st.download_button("Download CSV", csv_bytes, file_name=f"transactions_all.csv", mime="text/csv")
 
-# Visual reports
 st.header("Reports & Charts")
 import pandas as pd
 rows_all = get_all_transactions(conn)
@@ -115,13 +108,11 @@ if rows_all:
     df = pd.DataFrame(rows_all, columns=["id", "date", "amount", "category", "description", "type"])
     df["date"] = pd.to_datetime(df["date"])
 
-    # Expense by category
     exp_by_cat = df[df["type"] == "expense"].groupby("category")["amount"].sum().sort_values(ascending=False)
     if not exp_by_cat.empty:
         st.subheader("Expense by category")
         st.bar_chart(exp_by_cat)
 
-    # Monthly trend
     df["ym"] = df["date"].dt.to_period("M").dt.to_timestamp()
     trend = df.groupby(["ym", "type"])['amount'].sum().unstack(fill_value=0)
     if not trend.empty:
