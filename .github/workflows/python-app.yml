@@ -16,10 +16,6 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-<<<<<<< HEAD
-          # THIS IS THE CRITICAL LINE:
-=======
->>>>>>> e723b5d (updated the files)
           pip install -e . 
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           pip install pytest click streamlit
